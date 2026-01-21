@@ -129,3 +129,46 @@ def train_one_run(
 		seconds=float(seconds)
 	)
 
+	os.makedirs(os.path.dirname(log_path), exists_ok=True)
+	with open(log_path, 'a', encoding="utf-8") as f:
+		f.write(json.dumps(asdict(result)) + '\n')
+	
+	return result
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--width-mult", type=float, default=1.0)
+    ap.add_argument("--budget", type=int, default=int(2e8))
+    ap.add_argument("--batch-size", type=int, default=128)
+    ap.add_argument("--lr", type=float, default=0.05)
+    ap.add_argument("--num-workers", type=int, default=2)
+    ap.add_argument("--no-mps", action="store_true")
+    ap.add_argument("--log-path", type=str, default="results/runs.jsonl")
+    args = ap.parse_args()
+
+    res = train_one_run(
+        seed=args.seed,
+        width_mult=args.width_mult,
+        budget_param_steps=args.budget,
+        batch_size=args.batch_size,
+        lr=args.lr,
+        num_workers=args.num_workers,
+        prefer_mps=not args.no_mps,
+        log_path=args.log_path,
+    )
+
+    print("\n=== Run summary ===")
+    print(f"device: {res.device}")
+    print(f"width_mult: {res.width_mult}")
+    print(f"params: {res.params:,}")
+    print(f"budget: {res.budget_param_steps:,}  (param-steps)")
+    print(f"steps: {res.steps:,}")
+    print(f"test_acc: {res.test_acc:.4f}")
+    print(f"test_loss: {res.test_loss:.4f}")
+    print(f"seconds: {res.seconds:.1f}")
+    print(f"logged to: {args.log_path}")
+
+
+if __name__ == "__main__":
+    main()
