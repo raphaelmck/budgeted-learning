@@ -17,7 +17,7 @@ def cifar10_loaders(batch_size: int = 128, num_workers: int = 2):
 
 	train_loader = DataLoader(
 		train_ds, batch_size=batch_size, shuffle=True,
-		num_workers=num_workers, persisten_workers=False
+		num_workers=num_workers, persistent_workers=False
 	)
 	test_loader = DataLoader(
 		test_ds, batch_size=batch_size, shuffle=False,
