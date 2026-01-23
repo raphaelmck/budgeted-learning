@@ -6,7 +6,7 @@ import torch.nn.functional as F
 
 class TinyCNN(nn.Module):
 	def __init__(self, width_mult: float = 1.0, num_classes: int = 10):
-		super.__init__()
+		super().__init__()
 		base = 32
 		c = max(8, int(base * width_mult))
 

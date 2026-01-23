@@ -91,7 +91,7 @@ def train_one_run(
 	last_loss = float("nan")
 
 	pbar = tqdm(range(steps), desc=f"train w={width_mult} P={params} T={steps}", leave=False)
-	for _ in pbar:
+	for step in pbar:
 		try:
 			x, y = next(train_iter)
 		except StopIteration:
@@ -106,7 +106,8 @@ def train_one_run(
 		loss.backward()
 		optimizer.step()
 
-		last_loss = float(loss.item())
+		if step % 50 == 0:
+			last_loss = float(loss.item())
 		pbar.set_postfix(loss=f"{last_loss:.4f}")
 	
 	test_loss, test_acc = eval_model(model, test_loader, device=device)
@@ -129,7 +130,7 @@ def train_one_run(
 		seconds=float(seconds)
 	)
 
-	os.makedirs(os.path.dirname(log_path), exists_ok=True)
+	os.makedirs(os.path.dirname(log_path), exist_ok=True)
 	with open(log_path, 'a', encoding="utf-8") as f:
 		f.write(json.dumps(asdict(result)) + '\n')
 	
