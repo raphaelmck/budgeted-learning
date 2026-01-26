@@ -22,6 +22,7 @@ class RunResult:
 	seed: int
 	width_mult: float
 	budget_param_steps: int
+	effective_budget_param_steps: int
 	params: int
 	steps: int
 	batch_size: int
@@ -40,6 +41,8 @@ def set_seed(seed: int) -> None:
 def get_device(prefer_mps: bool = True) -> torch.device:
 	if prefer_mps and torch.backends.mps.is_available():
 		return torch.device("mps")
+	if torch.cuda.is_available():
+		return torch.device("cuda")
 	return torch.device("cpu")
 
 @torch.no_grad()
@@ -113,12 +116,14 @@ def train_one_run(
 	test_loss, test_acc = eval_model(model, test_loader, device=device)
 
 	seconds = time.time() - t0
-	# see types if conversion is necessary
+	effective_budget_param_steps = steps * params
+
 	result = RunResult(
 		timestamp=time.time(),
 		seed=seed,
 		width_mult=width_mult,
 		budget_param_steps=int(budget_param_steps),
+		effective_budget_param_steps=int(effective_budget_param_steps),
 		params=int(params),
 		steps=int(steps),
 		batch_size=int(batch_size),
@@ -145,7 +150,7 @@ def main():
     ap.add_argument("--lr", type=float, default=0.05)
     ap.add_argument("--num-workers", type=int, default=2)
     ap.add_argument("--no-mps", action="store_true")
-    ap.add_argument("--log-path", type=str, default="results/runs.jsonl")
+    ap.add_argument("--log-path", type=str, default="results/runs_v1.jsonl")
     args = ap.parse_args()
 
     res = train_one_run(

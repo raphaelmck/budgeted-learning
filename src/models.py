@@ -11,18 +11,23 @@ class TinyCNN(nn.Module):
 		c = max(8, int(base * width_mult))
 
 		self.conv1 = nn.Conv2d(3, c, kernel_size=3, padding=1)
+		self.bn1 = nn.BatchNorm2d(c)
+
 		self.conv2 = nn.Conv2d(c, 2*c, kernel_size=3, padding=1)
+		self.bn2 = nn.BatchNorm2d(2*c)
+
 		self.conv3 = nn.Conv2d(2*c, 4*c, kernel_size=3, padding=1)
+		self.bn3 = nn.BatchNorm2d(4*c)
 
 		self.pool = nn.MaxPool2d(2)
 		self.fc = nn.Linear(4*c, num_classes)
 
 	def forward(self, x: torch.Tensor) -> torch.Tensor:
-		x = F.relu(self.conv1(x))
-		x = F.relu(self.conv2(x))
+		x = F.relu(self.bn1(self.conv1(x)))
+		x = F.relu(self.bn2(self.conv2(x)))
 		x = self.pool(x)
 
-		x = F.relu(self.conv3(x))
+		x = F.relu(self.bn3(self.conv3(x)))
 		x = self.pool(x)
 
 		x = x.mean(dim=(2, 3))
