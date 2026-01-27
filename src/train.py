@@ -148,7 +148,7 @@ def main():
     ap.add_argument("--budget", type=int, default=int(2e8))
     ap.add_argument("--batch-size", type=int, default=128)
     ap.add_argument("--lr", type=float, default=0.05)
-    ap.add_argument("--num-workers", type=int, default=2)
+    ap.add_argument("--num-workers", type=int, default=0)
     ap.add_argument("--no-mps", action="store_true")
     ap.add_argument("--log-path", type=str, default="results/runs_v1.jsonl")
     args = ap.parse_args()
